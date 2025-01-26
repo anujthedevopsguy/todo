@@ -8,7 +8,7 @@ phases:
     commands:
       - echo Building the Docker image...
       - docker build -t todo .
-      - docker tag quest:latest $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/todo:ui
+      - docker tag todo:ui $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/todo:ui
   post_build:
     commands:
       - echo Pushing the Docker image...
