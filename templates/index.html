@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script>
+        async function listTasks() {
+            const taskList = document.getElementById("task-list");
+            taskList.innerHTML = "Loading tasks...";
+
+            try {
+                const response = await fetch("/todos");
+                if (!response.ok) {
+                    throw new Error("Failed to fetch tasks");
+                }
+                const tasks = await response.json();
+                taskList.innerHTML = ""; // Clear the loading message
+
+                if (tasks.length === 0) {
+                    taskList.innerHTML = "<li>No tasks available</li>";
+                } else {
+                    tasks.forEach(task => {
+                        const li = document.createElement("li");
+                        li.textContent = task.task;
+                        taskList.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                taskList.innerHTML = `<li style="color: red;">${error.message}</li>`;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Todo App</h1>
+    <form action="/add-task" method="post">
+        <input type="text" name="task" placeholder="Add a new task" required>
+        <button type="submit">Add Task</button>
+    </form>
+    <button onclick="listTasks()">List Tasks</button>
+    <ul id="task-list">
+        <!-- Tasks will be dynamically populated here -->
+    </ul>
+</body>
+</html>
