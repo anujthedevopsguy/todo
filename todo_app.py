@@ -39,7 +39,7 @@ def get_db_connection():
             host=os.getenv("MYSQL_HOSTNAME"),
             user=os.getenv("MYSQL_USER"),
             password=os.getenv("MYSQL_PASSWORD"),
-            database="todo_db",
+            database=os.getenv("MYSQL_DATABASE"),
             port=int(os.getenv("MYSQL_PORT", 3306))
         )
         return connection
