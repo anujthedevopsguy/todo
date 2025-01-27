@@ -1,4 +1,4 @@
-import mysql.connector
+import pymysql
 from fastapi import FastAPI, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse, Response
 from fastapi.templating import Jinja2Templates
@@ -6,7 +6,6 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from prometheus_client import Counter, generate_latest, CollectorRegistry
 import os
-from mysql.connector import Error
 from typing import List
 
 # FastAPI instance
@@ -35,7 +34,7 @@ templates = Jinja2Templates(directory="templates")
 # Define the MySQL connection
 def get_db_connection():
     try:
-        connection = mysql.connector.connect(
+        connection = pymysql.connect(
             host=os.getenv("MYSQL_HOSTNAME"),
             user=os.getenv("MYSQL_USER"),
             password=os.getenv("MYSQL_PASSWORD"),
@@ -43,7 +42,7 @@ def get_db_connection():
             port=int(os.getenv("MYSQL_PORT", 3306))
         )
         return connection
-    except Error as e:
+    except pymysql.MySQLError as e:
         print(f"Error: {e}")
         raise HTTPException(status_code=500, detail="Database connection error")
 
@@ -68,7 +67,7 @@ async def add_todo(todo: Todo):
         tasks_created.inc()  # Increment the tasks_created counter
         todo_requests_total.labels(method="POST", endpoint="/todos", status="200").inc()
         return {"message": "Task added successfully"}
-    except Error as e:
+    except pymysql.MySQLError as e:
         connection.rollback()
         todo_requests_total.labels(method="POST", endpoint="/todos", status="500").inc()
         raise HTTPException(status_code=500, detail="Failed to add task")
@@ -87,7 +86,7 @@ async def get_todos():
         tasks = cursor.fetchall()
         todo_requests_total.labels(method="GET", endpoint="/todos", status="200").inc()
         return [{"task": task[0]} for task in tasks]
-    except Error as e:
+    except pymysql.MySQLError as e:
         todo_requests_total.labels(method="GET", endpoint="/todos", status="500").inc()
         raise HTTPException(status_code=500, detail="Failed to fetch tasks")
     finally:
