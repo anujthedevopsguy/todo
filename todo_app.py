@@ -35,10 +35,10 @@ templates = Jinja2Templates(directory="templates")
 def get_db_connection():
     try:
         connection = pymysql.connect(
-            host=os.getenv("MYSQL_HOSTNAME"),
-            user=os.getenv("MYSQL_USER"),
-            password=os.getenv("MYSQL_PASSWORD"),
-            database=os.getenv("MYSQL_DATABASE"),
+            host=os.getenv("MYSQL_HOSTNAME").strip(),
+            user=os.getenv("MYSQL_USER").strip(),
+            password=os.getenv("MYSQL_PASSWORD").strip(),
+            database=os.getenv("MYSQL_DATABASE").strip(),
             port=int(os.getenv("MYSQL_PORT", 3306))
         )
         return connection
